@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Role {
+  id    Int    @id @default(autoincrement()) @db.SmallInt
+  name  String @db.VarChar(127)
+
+  users User[]
+
+  @@map("roles")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(127)
+  email     String   @unique @db.VarChar(127)
+  password  String   @db.VarChar(255)
+  isActive  Boolean  @default(true) @map("is_active")
+  roleId    Int      @map("role_id") @db.SmallInt
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  role         Role           @relation(fields: [roleId], references: [id])
+  actuatorLogs ActuatorLog[]
+
+  @@map("users")
+}
+
+model SensorReading {
+  id          Int      @id @default(autoincrement())
+  nodeId      String   @map("node_id") @db.VarChar(63)
+  temperature Decimal  @db.Decimal(5, 2)
+  humidity    Decimal  @db.Decimal(5, 2)
+  isAnomaly   Boolean  @default(false) @map("is_anomaly")
+  recordedAt  DateTime @default(now()) @map("recorded_at")
+
+  @@map("sensor_readings")
+}
+
+model ActuatorLog {
+  id          Int      @id @default(autoincrement())
+  userId      Int?     @map("user_id")
+  actuatorId  String   @map("actuator_id") @db.VarChar(63)
+  action      String   @db.VarChar(3)
+  source      String   @db.VarChar(6)
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@map("actuator_logs")
+}
