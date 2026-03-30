@@ -1,4 +1,5 @@
 import express, { Router } from 'express';
+import { connectMQTT } from './lib/mqtt';
 
 interface Options {
   port: number;
@@ -17,11 +18,12 @@ class Server {
 
   public async start() {
     this.app.use(express.json());
-    this.app.use(express.urlencoded());
+    this.app.use(express.urlencoded({ extended: true }));
     this.app.use(this.routes);
 
     this.app.listen(this.port, () => {
       console.log(`Server running on port ${this.port}`);
+      connectMQTT();
     });
   }
 }
