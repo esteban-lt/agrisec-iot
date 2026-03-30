@@ -39,7 +39,7 @@ export class AuthMiddleware {
   static requireRole = (role: string) => {
     return (request: Request, response: Response, next: NextFunction) => {
       if (request.user?.role !== role) {
-        response.status(403).json({ ok: false, message: 'Forbidden' });
+        response.status(403).json({ ok: false, message: 'Not authorized' });
         return;
       }
       next();
